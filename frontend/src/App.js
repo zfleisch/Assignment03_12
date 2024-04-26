@@ -1,86 +1,91 @@
-import logo from './logo.svg';
 import React, {useState, useEffect} from "react";
 
 import './App.css';
 
+
 function App() {
   const [viewer, setViewer] = useState(0);
+  const [Products, setProducts] = useState([]);
+  const [id, setId] = useState("");
   
   const updateHooks = (e) => {
     setViewer(e);
   }
-  function Get()
+  function GetData()
   {
-    function loadItems(items)
-    {
-      var currentItems = document.getElementById("col");
-      //clear current Items
-      while(currentItems.firstChild) { 
-          currentItems.removeChild(currentItems.firstChild); 
-      }
-      for(var i = 0; i < items.length; i++)
-      {
-        let id = items[i].id;
-        let title = items[i].title;
-        let price = items[i].price;
-        let description = items[i].description;
-        let category = items[i].category;
-        let image = items[i].image;
-        let rate = items[i].rating.rate;
-        let count = items[i].rating.count;
-        let div = document.createElement("div");
-        div.innerHTML = `
-        <div class="card shadow-sm">
-        <img src=${image} class="card-img-top"></img>
-        <div class="card-body">
-          <p class="card-text"> ${id} <strong>${title}</strong> $${price}</p>
-          <div class="d-flex justify-content-between align-items-center">
-          <p>${category}</p>
-          <p>${description}</p>
-          </div>
-          <p>${rate} : ${count}</p>
-        </div>
-      </div>`;
-      }
-    }
+    updateHooks(1);
     fetch("http://localhost:8081/FakeStoreCatalog")
     .then(response => response.json())
-    .then(items => loadItems(items));
+    .then(products => setProducts(products));
+    console.log(Products);
+  }
+  function consultId()
+  {
+    console.log(id);
+    fetch("http://localhost:8081/FakeStoreCatalog/" + id)
+    .then(response => response.json())
+    .then(products => {
+      if(products.length === 0)
+      {
+        setProducts([]);
+      }
+      else
+      {
+        setProducts(products);
+      }
+    });
+    console.log(Products);
   }
 
   function Home()
   {
-    return (<div>
-              <button onClick={() => updateHooks(1)}>Get</button>
-              <button onClick={() => updateHooks(2)}>Post</button>
-              <button onClick={() => updateHooks(3)}>Put</button>
-              <button onClick={() => updateHooks(4)}>Delete</button>
-              <div class="album py-5 bg-body-tertiary">
-                  <div class="container">
-                    <div id="col" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-                    </div>
-                  </div>
+    const listItems = Products.map((el) =>(
+      <div class="row border-top border-bottom" key={el.id}>
+          <div class="group relative shadow-lg">
+              <div className=" min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-60 lg:aspect-none">
+                  <img className="w-full h-full object-center object-cover lg:w-full lg:h-full" src={el.image} width={200}/>
+              </div>
+              <div className="flex justify-between p-3">
+                <div>
+                  <h3 className="text-sm text-gray-700">
+                  <div class="row text-muted">Product id: {el.id} </div>
+                  <div class="row text-muted"><strong>{el.title}</strong></div>
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-500">Rating: {el.rating.rate}</p>
+                  <p className="text-sm font-medium text-green-600">${el.price}</p>
                 </div>
-              </div>);
-  }
-
-
-  if(viewer === 0)
-  {
-    return (
-      <div>
-        <Home/>
+              </div>
+          </div>
       </div>
-    );
-  }
+  ));
   if(viewer === 1)
   {
-    return (
-      <div>
-        <Get/>
-      </div>
-    );
+    return  <div>
+                <div>
+                  <button type="button" onClick={() => GetData()}>Get</button>
+                  <button type="button" onClick={() => updateHooks(2)}>Post</button>
+                  <button type="button" onClick={() => updateHooks(3)}>Put</button>
+                  <button type="button" onClick={() => updateHooks(4)}>Delete</button>
+                </div>
+                  
+                <div className="m-6 p-3 mt-10 ml-0 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-6 xl:gap-x-10" style={{ maxHeight: '800px', overflowY: 'scroll' }}>
+                  {listItems}
+                </div>
+              </div>
   }
+  return <div>
+          <button onClick={() => GetData()}>Get</button>
+          <button onClick={() => updateHooks(2)}>Post</button>
+          <button onClick={() => updateHooks(3)}>Put</button>
+          <button onClick={() => updateHooks(4)}>Delete</button>
+        </div>
+  }
+
+  return (
+    <div>
+      <Home/>
+    </div>
+  );
 }
 
 export default App;
