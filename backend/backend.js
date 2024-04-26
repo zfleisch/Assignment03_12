@@ -68,20 +68,7 @@ app.post("/FakeStoreCatalog", async (req, res) => {
                 "rate":req.body.rating.rate,
                 "count":req.body.rating.count
             }
-            };
-            /**
-             * "id": 1,
-    "title": "Pierced Owl Rose Gold Plated Stainless Steel Double",
-    "price": 10.99,
-    "description": "Rose Gold Plated Double Flared Tunnel Plug Earrings. Made of 316L Stainless Steel",
-    "category": "jewelery",
-    "image": "https://fakestoreapi.com/img/51UDEzMJVpL._AC_UL640_QL65_ML3_.jpg",
-    "rating": {
-        "rate": 1.9,
-        "count": 100
-    }
-             */
-
+        };
         console.log(newDocument);
 
         const results = await db
@@ -105,12 +92,12 @@ app.delete("/FakeStoreCatalog/:id", async (req, res) => {
     console.log("Store item to delete :",id);
     const query = { "id": id };
     // delete
-    const robotDeleted = await db.collection("robot").deleteOne(query);
+    const itemDeleted = await db.collection("fakestore_catalog").deleteOne(query);
     res.status(200);
-    res.send(robotDeleted);
+    res.send(itemDeleted);
     }
     catch (error){
-    console.error("Error deleting robot:", error);
+    console.error("Error deleting item:", error);
     res.status(500).send({ message: 'Internal Server Error' });
     }
 });
@@ -124,15 +111,21 @@ app.put("/FakeStoreCatalog/:id", async (req, res) => {
     console.log(req.body);
     const updateData = {
         $set:{
-        "name": req.body.name,
-        "price": req.body.price,
-        "description": req.body.description,
-        "imageUrl": req.body.imageUrl
+            "id": req.body.id,
+            "title": req.body.title,
+            "price": req.body.price,
+            "description": req.body.description,
+            "category": req.body.category,
+            "image": req.body.image,
+            "rating": {
+                "rate":req.body.rating.rate,
+                "count":req.body.rating.count
+            }
         }
     };
     // Add options if needed, for example { upsert: true } to create a document if it doesn't exist
     const options = { };
-    const results = await db.collection("robot").updateOne(query, updateData, options);
+    const results = await db.collection("fakestore_catalog").updateOne(query, updateData, options);
     // If no document was found to update, you can choose to handle it by sending a 404 response
     if (results.matchedCount === 0) {
         return res.status(404).send({ message: 'Store item not found' });
