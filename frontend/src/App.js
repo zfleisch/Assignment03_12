@@ -4,74 +4,99 @@ import './App.css';
 
 
 function App() {
-  const [viewer, setViewer] = useState(0);
-  const [Products, setProducts] = useState([]);
-  const [searchInput, setSearchInput] = useState("");
-  
-  const updateHooks = (e) => {
-    setViewer(e);
-  }
-  function GetData()
-  {
-    updateHooks(1);
-      fetch("http://localhost:8081/FakeStoreCatalog")
-      .then(response => response.json())
-      .then(products => setProducts(products));
-      console.log(Products);
+  const [product, setProduct] = useState([]);
+  const [oneProduct, setOneProduct] = useState([]);
+  const [addNewProduct, setAddNewProduct] = useState({
+    id: 0,
+    title: "",
+    price: 0.0,
+    description: "",
+    category: "",
+    image: "",
+    rating: 0.0,
+  });
+
+  const [viewer1, setViewer1] = useState(false);
+  const [viewer2, setViewer2] = useState(false);
+
+  useEffect(() =>{
+    getAllProducts();
+  }, []);
+
+  function getAllProducts() {
+    fetch("http://localhost:8081/FakeStoreCatalog")
+    .then(response => response.json())
+    .then((data) => {
+      console.log(data);
+      setProduct(data);
+    });
+    setViewer1(!viewer1);
   }
 
-  function Home()
-  {
-    const handleSearchInputChange = (e) => {
-      setSearchInput(e.target.value);
-    }
-
-  if(viewer === 1)
-  {
-    const listItems = Products.map((el) =>(
-      <div class="row border-top border-bottom" key={el.id}>
-          <div class="group relative shadow-lg">
-              <div className=" min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-60 lg:aspect-none">
-                  <img className="w-full h-full object-center object-cover lg:w-full lg:h-full" src={el.image} width={200}/>
-              </div>
-              <div className="flex justify-between p-3">
-                <div>
-                  <h3 className="text-sm text-gray-700">
-                  <div class="row text-muted">Product id: {el.id} </div>
-                  <div class="row text-muted"><strong>{el.title}</strong></div>
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">Rating: {el.rating.rate}</p>
-                  <p className="text-sm font-medium text-green-600">${el.price}</p>
-                </div>
-              </div>
-          </div>
-      </div>
+  const showAllItems = product.map((el) => (
+    <div key={el.id}>
+      <img src={el.image} width={200} alt="images"/> <br />
+      Title: {el.title} <br />
+      Category: {el.category} <br />
+      Price: {el.price} <br />
+      Rating: {el.rating.rate} <br />
+      Number of Reviews: {el.rating.count} <br />
+    </div>
   ));
-    return  <div>
-                <div>
-                  <button type="button" onClick={() => GetData()}>Get</button>
-                  <button type="button" onClick={() => updateHooks(2)}>Post</button>
-                  <button type="button" onClick={() => updateHooks(3)}>Put</button>
-                  <button type="button" onClick={() => updateHooks(4)}>Delete</button>
-                </div>
-                  <input type="text" value={searchInput} onChange={handleSearchInputChange}/>
-                  <button onClick={() => GetData(searchInput)}>Search</button>
-                <div className="m-6 p-3 mt-10 ml-0 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-6 xl:gap-x-10" style={{ maxHeight: '800px', overflowY: 'scroll' }}>
-                  {listItems}
-                </div>
-              </div>
+
+  function getOneProduct(id) {
+    console.log(id);
+    if(id >= 1 && id <= 20)
+    {
+      fetch("http://localhost:8081/FakeStoreCatalog/" + id)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setOneProduct(data);
+      })
+    }
+    if(viewer2 === false)
+    {
+      setViewer2(true);
+    }
+    else
+    {
+      console.log("Wrong number of Product id");
+    }
   }
-  return <div>
-          <button onClick={() => GetData()}>Get</button>
-          <button onClick={() => updateHooks(2)}>Post</button>
-          <button onClick={() => updateHooks(3)}>Put</button>
-          <button onClick={() => updateHooks(4)}>Delete</button>
-        </div>
-  }
+
+  const showOneItem = oneProduct.map((el) => (
+    <div key={el.id}>
+      <img src={el.image} width={200} alt="images"/> <br />
+      Title: {el.title} <br />
+      Category: {el.category} <br />
+      Price: {el.price} <br />
+      Rating: {el.rating.rate} <br />
+      Number of Reviews: {el.rating.count} <br />
+    </div>
+  ));
+
+
+
+
 
   return (
     <div>
-      <Home/>
+      <button>Products</button>
+      <button>Add New Product</button>
+      <button>Remove a Product</button>
+      <button>Change Item Price</button>
+      <h1>Catalog of Products</h1>
+      <div>
+        <h3>Show one Product by Id:</h3>
+        <input type="text" id="message" name="message" placeholder="id" onChange={(e) => getOneProduct(e.target.value)}/>
+        {viewer2 && showOneItem}
+      </div>
+      <div>
+        <h3>Show all products</h3>
+        <button onClick={() => getAllProducts()}>Show All</button>
+        {viewer1 && showAllItems}
+      </div>
     </div>
   );
 }

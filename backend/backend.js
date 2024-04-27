@@ -50,7 +50,7 @@ app.get("/FakeStoreCatalog/:id", async (req, res) => {
 
     console.log("Results :", results);
     if(!results) res.send("Not Found").status(404);
-    else res.send(results).status(200);
+    else res.send([results]).status(200);
 });
 
 app.post("/FakeStoreCatalog", async (req, res) => {
