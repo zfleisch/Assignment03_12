@@ -314,6 +314,7 @@ dark:focus:ring-blue-500 dark:focus:border-blue-500" type="search" value={newPri
         <button onClick={() => setViewer(1)}>Add New Product</button>
         <button onClick={() => setViewer(2)}>Remove a Product</button>
         <button onClick={() => setViewer(3)}>Change Item Price</button>
+        <button onClick={() => setViewer(4)}>Student Info</button>
         <h1>Catalog of Products</h1>
         <div>
           <h3>Show one Product by Id:</h3>
@@ -366,6 +367,28 @@ dark:focus:ring-blue-500 dark:focus:border-blue-500" type="search" value={newPri
         </div>
       </div>
     );
+  }
+  else if(viewer === 4)
+  {
+    return (
+      <div>
+        <button onClick={() => setViewer(0)}>Back to Products</button>
+        <div>
+          <h3>Student Information</h3>
+          <p>Zak Fleischman - zfleisch@iastate.edu</p>
+          <p>John Lavigne - jlavigne@iastate.edu</p>
+          <h3>Course Information</h3>
+          <p>Iowa State University</p>
+          <p>Com S/SE 319</p>
+          <p>Construction of user interfaces</p>
+          <p>Professors: Ali Jannesari, Abraham Aldaco</p>
+          <h3>Date and Description</h3>
+          <p>April 27, 2024</p>
+          <p>Hello, this is a Com S 319 project that focuses on using a react native app in the front end and uses nodemon and express for backend database access. This project is model off of a product catalog that allows users to view the products, add new products, delete products, and update the price of selected products.</p>
+        </div>
+      </div>
+    );
+    
   }
   
 }
