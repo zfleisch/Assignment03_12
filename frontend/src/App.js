@@ -7,6 +7,7 @@ function App() {
   const [product, setProduct] = useState([]);
   const [oneProduct, setOneProduct] = useState([]);
   const [deleteProduct, setDeleteProduct] = useState([]);
+  const [putProduct, setPutProduct] = useState([]);
   const [addNewProduct, setAddNewProduct] = useState({
     id: 0,
     title: "",
@@ -20,9 +21,11 @@ function App() {
     }
   });
   const { register, handleSubmit, formState: {errors} } = useForm();
-
+  const [newPrice, setNewPrice] = useState('');
   const [viewer1, setViewer1] = useState(false);
   const [viewer2, setViewer2] = useState(false);
+  const [viewer3, setViewer3] = useState(false);
+  const [reload, setReload] = useState(false);
   const [viewer, setViewer] = useState(0);
 
   useEffect(() =>{
@@ -37,6 +40,39 @@ function App() {
       setProduct(data);
     });
   }
+
+  function putSearch(id) {
+    console.log(id);
+    if(id >= 1 && id <= 20)
+    {
+      fetch("http://localhost:8081/FakeStoreCatalog/" + id)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setPutProduct(data);
+      })
+    }
+    if(viewer3 === false)
+    {
+      setViewer3(true);
+    }
+    else
+    {
+      console.log("Wrong number of Product id");
+    }
+  }
+
+
+  const showPutItem = putProduct.map((el) => (
+    <div key={el.id}>
+      <img src={el.image} width={200} alt="images"/> <br />
+      Title: {el.title} <br />
+      Category: {el.category} <br />
+      Price: {el.price} <br />
+      Rating: {el.rating.rate} <br />
+      Number of Reviews: {el.rating.count} <br />
+    </div>
+  ));
 
   function deleteSearch(id) {
     console.log(id);
@@ -58,6 +94,7 @@ function App() {
       console.log("Wrong number of Product id");
     }
   }
+
 
   const showDeleteItem = deleteProduct.map((el) => (
     <div key={el.id}>
@@ -131,8 +168,11 @@ function App() {
       .catch(error => {
         console.log(error);
       });
+      setReload(true);
       setViewer(0);
-      getAllProducts();
+      setViewer1(false);
+      setViewer2(false);
+      setViewer3(false);
   }
 
   const showNewItemForm = (
@@ -175,19 +215,90 @@ function App() {
   </div>
   );
 
-    function deleteProduct()
+    function removeProduct()
     {
-      
+      const id = deleteProduct[0].id;
+      console.log(id);
+      fetch("http://localhost:8081/FakeStoreCatalog/" + id, 
+      {
+        method: 'DELETE'
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      setReload(true);
+      setViewer(0);
+      setViewer1(false);
+      setViewer2(false);
+      setViewer3(false);
     }
 
     const deleteButton = (
-      <button onClick={() => deleteProduct()}>Delete this Product</button>
+      <button onClick={() => removeProduct()}>Delete this Product</button>
+    );
+
+    const handleChange = (e) => {
+      setNewPrice(e.target.value);
+    }
+
+    function changePrice()
+    {
+      const inputProduct = {
+        id: putProduct[0].id,
+        title: putProduct[0].title,
+        price: newPrice,
+        description: putProduct[0].description,
+        category: putProduct[0].category,
+        image: putProduct[0].image,
+        rating: {
+          rate: putProduct[0].rating.rate,
+          count: putProduct[0].rating.count
+        }
+      };
+      console.log("PUT Data");
+      console.log(inputProduct);
+      fetch("http://localhost:8081/FakeStoreCatalog/" + putProduct[0].id, 
+      {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(inputProduct)
+      })
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+      setNewPrice('');
+      setReload(true);
+      setViewer(0);
+      setViewer1(false);
+      setViewer2(false);
+      setViewer3(false);
+    }
+
+    const updateStuff = (
+      <div>
+        <input className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700
+dark:border-gray-600 dark:placeholder-gray-400 dark:text-white
+dark:focus:ring-blue-500 dark:focus:border-blue-500" type="search" value={newPrice} onChange={handleChange}/>
+        <button onClick={() => changePrice()}>Change Price</button>
+      </div>
     );
 
 
 
   if(viewer === 0)
   {
+    if(reload)
+    {
+      getAllProducts();
+      setReload(false);
+    }
     const showAllItems = product.map((el) => (
       <div key={el.id}>
         <img src={el.image} width={200} alt="images"/> <br />
@@ -247,18 +358,12 @@ function App() {
     return (
       <div>
         <button onClick={() => setViewer(0)}>Back to Products</button>
-
-      </div>
-    );
-  }
-  else if(viewer === 4)
-  {
-    return (
-      <div>
-        <button >Products</button>
-        <button >Add New Product</button>
-        <button >Remove a Product</button>
-        <button >Change Item Price</button>
+        <div>
+          <h3>Find item to update</h3>
+          <input type="text" id="message" name="message" placeholder="id" onChange={(e) => putSearch(e.target.value)}/>
+          {viewer3 && showPutItem}
+          {viewer3 && updateStuff}
+        </div>
       </div>
     );
   }

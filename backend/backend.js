@@ -114,15 +114,15 @@ app.put("/FakeStoreCatalog/:id", async (req, res) => {
     console.log(req.body);
     const updateData = {
         $set:{
-            "id": req.body.id,
+            "id": Number(req.body.id),
             "title": req.body.title,
-            "price": req.body.price,
+            "price": Number(req.body.price),
             "description": req.body.description,
             "category": req.body.category,
             "image": req.body.image,
             "rating": {
-                "rate":req.body.rating.rate,
-                "count":req.body.rating.count
+                "rate": Number(req.body.rating.rate),
+                "count": Number(req.body.rating.count)
             }
         }
     };
