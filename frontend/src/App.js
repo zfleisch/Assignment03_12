@@ -6,7 +6,7 @@ import './App.css';
 function App() {
   const [viewer, setViewer] = useState(0);
   const [Products, setProducts] = useState([]);
-  const [id, setId] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   
   const updateHooks = (e) => {
     setViewer(e);
@@ -14,30 +14,19 @@ function App() {
   function GetData()
   {
     updateHooks(1);
-    fetch("http://localhost:8081/FakeStoreCatalog")
-    .then(response => response.json())
-    .then(products => setProducts(products));
-    console.log(Products);
-  }
-  function consultId()
-  {
-    console.log(id);
-    fetch("http://localhost:8081/FakeStoreCatalog/" + id)
-    .then(response => response.json())
-    .then(products => {
-      if(products.length === 0)
-      {
-        setProducts([]);
-      }
-      else
-      {
-        setProducts(products);
-      }
-    });
-    console.log(Products);
+      fetch("http://localhost:8081/FakeStoreCatalog")
+      .then(response => response.json())
+      .then(products => setProducts(products));
+      console.log(Products);
   }
 
   function Home()
+  {
+    const handleSearchInputChange = (e) => {
+      setSearchInput(e.target.value);
+    }
+
+  if(viewer === 1)
   {
     const listItems = Products.map((el) =>(
       <div class="row border-top border-bottom" key={el.id}>
@@ -58,8 +47,6 @@ function App() {
           </div>
       </div>
   ));
-  if(viewer === 1)
-  {
     return  <div>
                 <div>
                   <button type="button" onClick={() => GetData()}>Get</button>
@@ -67,7 +54,8 @@ function App() {
                   <button type="button" onClick={() => updateHooks(3)}>Put</button>
                   <button type="button" onClick={() => updateHooks(4)}>Delete</button>
                 </div>
-                  
+                  <input type="text" value={searchInput} onChange={handleSearchInputChange}/>
+                  <button onClick={() => GetData(searchInput)}>Search</button>
                 <div className="m-6 p-3 mt-10 ml-0 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-6 xl:gap-x-10" style={{ maxHeight: '800px', overflowY: 'scroll' }}>
                   {listItems}
                 </div>
